@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GastroAnalyst — AI Social Media Office</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Outfit:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0A0C08; --surface:#111409; --surface2:#181B10;
+  --border:rgba(168,196,74,0.12); --green:#A8C44A; --green2:#7a9033;
+  --amber:#E8B84B; --red:#E85B4A; --blue:#4ABDE8;
+  --text:#EAE6DC; --text-dim:rgba(234,230,220,0.4); --text-mid:rgba(234,230,220,0.65);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;}
+
+/* SETUP */
+#setup{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+.setup-box{background:var(--surface);border:1px solid var(--border);padding:48px 40px;max-width:460px;width:100%;position:relative;}
+.setup-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--green),var(--amber));}
+.brand{font-family:'DM Serif Display',serif;font-size:30px;color:var(--green);}
+.brand-sub{font-size:10px;letter-spacing:5px;color:var(--text-dim);text-transform:uppercase;margin-top:4px;margin-bottom:36px;}
+.setup-box label{display:block;font-size:11px;letter-spacing:3px;color:var(--text-dim);text-transform:uppercase;margin-bottom:10px;}
+.setup-box input{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:14px 16px;font-family:'DM Mono',monospace;font-size:13px;outline:none;margin-bottom:8px;transition:border-color 0.2s;}
+.setup-box input:focus{border-color:var(--green);}
+.err-msg{color:var(--red);font-size:12px;margin-bottom:16px;min-height:18px;}
+.btn-start{width:100%;padding:16px;background:var(--green);border:none;color:#0A0C08;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:background 0.2s;}
+.btn-start:hover{background:var(--amber);}
+.setup-note{font-size:12px;color:var(--text-dim);margin-top:16px;line-height:1.7;}
+.setup-note a{color:var(--green);text-decoration:none;}
+
+/* APP */
+#app{display:none;min-height:100vh;flex-direction:column;}
+.header{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:100;}
+.header-brand{font-family:'DM Serif Display',serif;font-size:22px;color:var(--green);}
+.header-sub{font-size:9px;letter-spacing:4px;color:var(--text-dim);text-transform:uppercase;}
+.header-right{display:flex;align-items:center;gap:12px;}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.btn-gen{background:var(--green);border:none;color:#0A0C08;padding:10px 22px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all 0.2s;}
+.btn-gen:hover{background:var(--amber);}
+.btn-gen:disabled{background:var(--green2);cursor:not-allowed;opacity:0.7;}
+.btn-sm{background:transparent;border:1px solid var(--border);color:var(--text-dim);padding:8px 14px;font-size:11px;cursor:pointer;letter-spacing:1px;font-family:'Outfit',sans-serif;transition:all 0.2s;}
+.btn-sm:hover{border-color:var(--text-dim);color:var(--text);}
+.datebar{padding:10px 28px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:11px;color:var(--text-dim);letter-spacing:2px;}
+.datebar span{color:var(--green);}
+.main{flex:1;padding:24px 28px;display:flex;flex-direction:column;gap:20px;}
+
+/* GRID */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;}
+.card{background:var(--surface);border:1px solid var(--border);position:relative;overflow:hidden;display:flex;flex-direction:column;}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.card-ceo::before{background:var(--green);}
+.card-research::before{background:var(--blue);}
+.card-content::before{background:var(--amber);}
+.card-comment::before{background:var(--red);}
+.card-head{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--border);}
+.card-icon{font-size:20px;}
+.card-name{font-size:13px;font-weight:600;letter-spacing:1px;}
+.card-role{font-size:10px;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
+.card-status{margin-left:auto;font-size:10px;letter-spacing:2px;padding:4px 10px;border:1px solid;text-transform:uppercase;}
+.s-idle{color:var(--text-dim);border-color:var(--border);}
+.s-working{color:var(--amber);border-color:var(--amber);animation:blink 1s infinite;}
+.s-done{color:var(--green);border-color:var(--green);}
+.s-error{color:var(--red);border-color:var(--red);}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.4}}
+.card-body{padding:20px;flex:1;}
+.card-out{font-size:13px;color:var(--text-mid);line-height:1.75;white-space:pre-wrap;word-break:break-word;min-height:80px;}
+.card-ph{color:var(--text-dim);font-style:italic;font-size:12px;}
+.card-foot{padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;}
+.btn-copy{background:transparent;border:1px solid var(--border);color:var(--text-dim);padding:7px 14px;font-size:11px;cursor:pointer;letter-spacing:1px;font-family:'Outfit',sans-serif;transition:all 0.2s;text-transform:uppercase;}
+.btn-copy:hover,.btn-copy.copied{border-color:var(--green);color:var(--green);}
+
+/* LOG */
+.log-box{background:var(--surface);border:1px solid var(--border);padding:20px;}
+.log-title{font-size:10px;letter-spacing:4px;color:var(--text-dim);text-transform:uppercase;margin-bottom:12px;}
+.log-list{display:flex;flex-direction:column;gap:4px;max-height:100px;overflow-y:auto;}
+.log-row{font-family:'DM Mono',monospace;font-size:11px;}
+.log-t{color:var(--green2);margin-right:8px;}
+.log-m{color:var(--text-mid);}
+
+@keyframes dotanim{0%{content:'.'}33%{content:'..'}66%{content:'...'}100%{content:''}}
+.dots::after{content:'';animation:dotanim 1.2s infinite;}
+
+@media(max-width:600px){
+  .header{padding:12px 16px;}
+  .main{padding:16px;}
+  .btn-gen{padding:8px 14px;font-size:11px;}
+}
+</style>
+</head>
+<body>
+
+<div id="setup">
+  <div class="setup-box">
+    <div class="brand">GastroAnalyst</div>
+    <div class="brand-sub">AI Social Media Office</div>
+    <label>Claude API Anahtarı</label>
+    <input type="password" id="api-key" placeholder="sk-ant-api03-..." />
+    <div class="err-msg" id="err-msg"></div>
+    <button class="btn-start" onclick="startApp()">Sistemi Başlat →</button>
+    <div class="setup-note">
+      API anahtarın yok mu? <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>'dan al.<br>
+      Anahtar yalnızca senin cihazında saklanır, hiçbir yere gönderilmez.
+    </div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="header">
+    <div>
+      <div class="header-brand">GastroAnalyst</div>
+      <div class="header-sub">AI Social Media Office</div>
+    </div>
+    <div class="header-right">
+      <div class="dot"></div>
+      <button class="btn-gen" id="gen-btn" onclick="generateAll()">⚡ Bugünü Üret</button>
+      <button class="btn-sm" onclick="logout()">Çıkış</button>
+    </div>
+  </div>
+
+  <div class="datebar">◈ Günlük Üretim — <span id="today"></span></div>
+
+  <div class="main">
+    <div class="grid">
+
+      <div class="card card-ceo">
+        <div class="card-head">
+          <div class="card-icon">🧠</div>
+          <div><div class="card-name">CEO AJAN</div><div class="card-role">Strateji & Yön</div></div>
+          <div class="card-status s-idle" id="st-ceo">Bekliyor</div>
+        </div>
+        <div class="card-body"><div class="card-out" id="out-ceo"><span class="card-ph">Bugünün stratejisi burada görünecek...</span></div></div>
+        <div class="card-foot"><button class="btn-copy" onclick="doCopy('out-ceo',this)">Kopyala</button></div>
+      </div>
+
+      <div class="card card-research">
+        <div class="card-head">
+          <div class="card-icon">🔍</div>
+          <div><div class="card-name">ARAŞTIRMACI AJAN</div><div class="card-role">Trend & Haber</div></div>
+          <div class="card-status s-idle" id="st-research">Bekliyor</div>
+        </div>
+        <div class="card-body"><div class="card-out" id="out-research"><span class="card-ph">Güncel gıda trendleri burada...</span></div></div>
+        <div class="card-foot"><button class="btn-copy" onclick="doCopy('out-research',this)">Kopyala</button></div>
+      </div>
+
+      <div class="card card-content">
+        <div class="card-head">
+          <div class="card-icon">✍️</div>
+          <div><div class="card-name">İÇERİK AJAN</div><div class="card-role">Carousel & LinkedIn</div></div>
+          <div class="card-status s-idle" id="st-content">Bekliyor</div>
+        </div>
+        <div class="card-body"><div class="card-out" id="out-content"><span class="card-ph">Instagram carousel + LinkedIn postu burada...</span></div></div>
+        <div class="card-foot"><button class="btn-copy" onclick="doCopy('out-content',this)">Kopyala</button></div>
+      </div>
+
+      <div class="card card-comment">
+        <div class="card-head">
+          <div class="card-icon">💬</div>
+          <div><div class="card-name">YORUM AJAN</div><div class="card-role">Marka Etkileşimi</div></div>
+          <div class="card-status s-idle" id="st-comment">Bekliyor</div>
+        </div>
+        <div class="card-body"><div class="card-out" id="out-comment"><span class="card-ph">Ülker, Eti, Pınar yorum önerileri burada...</span></div></div>
+        <div class="card-foot"><button class="btn-copy" onclick="doCopy('out-comment',this)">Kopyala</button></div>
+      </div>
+
+    </div>
+
+    <div class="log-box">
+      <div class="log-title">◈ Sistem Logu</div>
+      <div class="log-list" id="log"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+let KEY = '';
+const DATE_STR = new Date().toLocaleDateString('tr-TR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+const AGENTS = {
+  ceo: {
+    label:'CEO Ajan',
+    sys:`Sen GastroAnalyst'in CEO yapay zeka ajanısın. GastroAnalyst; Türkiye'de işlenmiş gıdaların bilimsel ve POZİTİF yönlerini anlatan, gıda mühendisliği kökenli bir sosyal medya markasıdır. Rakibimiz @neyemeliyizzz negatif anlatırken biz bilimsel gerçekçilikle pozitif yönleri öne çıkarıyoruz. Hedef: Instagram tüketiciler + LinkedIn gıda şirketleri. Bugünkü strateji, öncelikli konu ve yapılacakları kısa-net anlat. Türkçe. Maks 150 kelime.`,
+    prompt:`Bugün ${DATE_STR}. GastroAnalyst için bugünkü stratejiyi belirle: hangi konuya odaklanmalı, neden, bugün ne yapılmalı?`
+  },
+  research: {
+    label:'Araştırmacı Ajan',
+    sys:`Sen GastroAnalyst'in araştırmacı ajanısın. İşlenmiş gıda sektöründe trendleri, bilimsel gelişmeleri ve Türkiye gıda pazarını takip edersin. Her zaman POZİTİF, bilimsel, nesnel bakış açısıyla yaklaşırsın. Türkçe. Maks 200 kelime.`,
+    prompt:`Bugün için Instagram'da viral olabilecek, işlenmiş gıdanın bilimsel veya pozitif bir yönünü anlatan konu öner. Neden viral olabileceğini açıkla ve carousel için 5 slayt başlığı ver.`
+  },
+  content: {
+    label:'İçerik Ajan',
+    sys:`Sen GastroAnalyst'in içerik yazarı ajanısın. Gıda mühendisliği bilgisiyle Instagram carousel ve LinkedIn postu yazarsın. Üslup: uzman ama samimi, bilimsel ama anlaşılır, pozitif ve merak uyandırıcı. Türkçe.`,
+    prompt:`Bugün için üret:
+1. INSTAGRAM CAROUSEL (5 slayt): Her slayt için başlık + 2 cümle. Konu: İşlenmiş gıdanın bir pozitif bilimsel yönü.
+2. HASHTAG (15 adet): Türkçe/İngilizce karma.
+3. LİNKEDİN POSTU: Gıda şirketlerine yönelik, profesyonel ton, 100-150 kelime.`
+  },
+  comment: {
+    label:'Yorum Ajan',
+    sys:`Sen GastroAnalyst'in etkileşim ajanısın. Büyük gıda markalarının (Ülker, Eti, Pınar, Torku, Nestlé Türkiye, Unilever Türkiye) Instagram/LinkedIn paylaşımlarına yapılacak akıllı yorumlar yazarsın. Yorumlar: kısa (1-2 cümle), uzman bakış katan, reklam gibi görünmeyen. Türkçe.`,
+    prompt:`5 büyük gıda markası için yorum öner (Ülker, Eti, Pınar, Torku, Nestlé Türkiye). Format: Marka adı → Yorum metni. Kısa, uzman, dikkat çekici.`
+  }
+};
+
+function addLog(msg) {
+  const t = new Date().toLocaleTimeString('tr-TR');
+  const el = document.getElementById('log');
+  el.innerHTML += `<div class="log-row"><span class="log-t">[${t}]</span><span class="log-m">${msg}</span></div>`;
+  el.scrollTop = el.scrollHeight;
+}
+
+function setStatus(key, s) {
+  const el = document.getElementById(`st-${key}`);
+  const map = {idle:'Bekliyor',working:'Çalışıyor',done:'Tamamlandı',error:'Hata'};
+  el.className = `card-status s-${s}`;
+  el.textContent = map[s];
+}
+
+async function runAgent(key) {
+  const ag = AGENTS[key];
+  setStatus(key, 'working');
+  document.getElementById(`out-${key}`).innerHTML = `<span class="dots">Ajan çalışıyor</span>`;
+  addLog(`${ag.label} başlatıldı...`);
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':KEY,'anthropic-version':'2023-06-01'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:ag.sys,messages:[{role:'user',content:ag.prompt}]})
+    });
+    if (!res.ok) { const e=await res.json(); throw new Error(e.error?.message||'API hatası'); }
+    const data = await res.json();
+    const text = data.content?.[0]?.text || 'Yanıt alınamadı.';
+    document.getElementById(`out-${key}`).textContent = text;
+    setStatus(key, 'done');
+    addLog(`${ag.label} tamamlandı ✓`);
+  } catch(e) {
+    document.getElementById(`out-${key}`).textContent = `Hata: ${e.message}`;
+    setStatus(key, 'error');
+    addLog(`${ag.label} hata: ${e.message}`);
+  }
+}
+
+async function generateAll() {
+  const btn = document.getElementById('gen-btn');
+  btn.disabled = true; btn.textContent = '⏳ Üretiliyor...';
+  addLog('══════ Günlük üretim başladı ══════');
+  for (const k of ['ceo','research','content','comment']) await runAgent(k);
+  addLog('══════ Tüm ajanlar tamamlandı ✓ ══════');
+  btn.disabled = false; btn.textContent = '⚡ Tekrar Üret';
+}
+
+function doCopy(id, btn) {
+  const txt = document.getElementById(id).textContent;
+  if (!txt || txt.includes('burada')) return;
+  navigator.clipboard.writeText(txt).then(()=>{
+    btn.textContent='✓ Kopyalandı'; btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent='Kopyala'; btn.classList.remove('copied'); },2000);
+  });
+}
+
+function startApp() {
+  const k = document.getElementById('api-key').value.trim();
+  const err = document.getElementById('err-msg');
+  if (!k.startsWith('sk-ant-')) { err.textContent='Geçerli bir API anahtarı gir (sk-ant- ile başlamalı)'; return; }
+  err.textContent='';
+  KEY = k;
+  localStorage.setItem('ga_key', k);
+  showApp();
+}
+
+function showApp() {
+  document.getElementById('setup').style.display='none';
+  document.getElementById('app').style.display='flex';
+  document.getElementById('today').textContent = DATE_STR;
+  addLog('GastroAnalyst AI Social Media Office açıldı');
+  addLog('⚡ "Bugünü Üret" butonuna bas');
+}
+
+function logout() {
+  localStorage.removeItem('ga_key');
+  KEY='';
+  document.getElementById('setup').style.display='flex';
+  document.getElementById('app').style.display='none';
+}
+
+window.onload = () => {
+  const saved = localStorage.getItem('ga_key');
+  if (saved) { KEY=saved; showApp(); }
+};
+</script>
+</body>
+</html>
