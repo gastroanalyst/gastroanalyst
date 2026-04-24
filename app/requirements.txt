@@ -1,0 +1,4 @@
+# Python 3.12 gerektirir (tkinter dahil)
+# Kurulum: python3.12 -m pip install --break-system-packages -r requirements.txt
+anthropic>=0.34.0
+customtkinter>=5.2.2
