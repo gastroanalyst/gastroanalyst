@@ -55,6 +55,7 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
 .card-research::before{background:var(--blue);}
 .card-content::before{background:var(--amber);}
 .card-comment::before{background:var(--red);}
+.card-menu::before{background:linear-gradient(90deg,var(--amber),var(--red));}
 .card-head{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--border);}
 .card-icon{font-size:20px;}
 .card-name{font-size:13px;font-weight:600;letter-spacing:1px;}
@@ -165,6 +166,19 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
         <div class="card-foot"><button class="btn-copy" onclick="doCopy('out-comment',this)">Kopyala</button></div>
       </div>
 
+      <div class="card card-menu" style="grid-column:1/-1;">
+        <div class="card-head">
+          <div class="card-icon">🍔</div>
+          <div><div class="card-name">MENÜ KARŞILAŞTIRMA AJANI</div><div class="card-role">Hamburger vs. Sağlıklı — Carousel & LinkedIn</div></div>
+          <div class="card-status s-idle" id="st-menu">Bekliyor</div>
+        </div>
+        <div class="card-body"><div class="card-out" id="out-menu"><span class="card-ph">Masanın bir kenarında 2500 kcal hamburger menü, diğer kenarında meyve ve süt ürünleri — 8 slaytlık carousel detayları burada görünecek...</span></div></div>
+        <div class="card-foot">
+          <button class="btn-copy" onclick="doCopy('out-menu',this)">Kopyala</button>
+          <button class="btn-gen" style="padding:7px 16px;font-size:11px;" onclick="runAgent('menu')">⚡ Üret</button>
+        </div>
+      </div>
+
     </div>
 
     <div class="log-box">
@@ -201,6 +215,43 @@ const AGENTS = {
     label:'Yorum Ajan',
     sys:`Sen GastroAnalyst'in etkileşim ajanısın. Büyük gıda markalarının (Ülker, Eti, Pınar, Torku, Nestlé Türkiye, Unilever Türkiye) Instagram/LinkedIn paylaşımlarına yapılacak akıllı yorumlar yazarsın. Yorumlar: kısa (1-2 cümle), uzman bakış katan, reklam gibi görünmeyen. Türkçe.`,
     prompt:`5 büyük gıda markası için yorum öner (Ülker, Eti, Pınar, Torku, Nestlé Türkiye). Format: Marka adı → Yorum metni. Kısa, uzman, dikkat çekici.`
+  },
+  menu: {
+    label:'Menü Karşılaştırma Ajani',
+    sys:`Sen GastroAnalyst'in menü karşılaştırma içerik ajanısın. Görevin: masanın bir kenarında 2500 kcal hamburger menü (büyük hamburger + büyük patates kızartması + büyük kola), diğer kenarında meyve ve süt ürünleri içeren ~600 kcal dengeli menü olan bir kaydırmalı post (carousel) için tam içerik ve tasarım detayı hazırlamak. Üslup: bilimsel ama samimi, eğitici ama yargılamayan, fast food'u kötülemeden karşılaştırmalı besin gerçeklerini aktaran, pozitif ve merak uyandırıcı. Türkçe.`,
+    prompt:`Masanın bir kenarında 2500 kcal hamburger menü (büyük hamburger, büyük patates kızartması, büyük kola), diğer kenarında meyve (elma, muz, çilek) ve süt ürünleri (yoğurt, peynir, ayran) içeren dengeli menü olan kaydırmalı post için şunları hazırla:
+
+━━━ 1. GÖRSEL TANIM (Kapak Slayt) ━━━
+Fotoğrafçı/tasarımcı için detaylı sahne tarifi:
+- Masa düzeni ve bölünme çizgisi
+- Sol taraf (hamburger menü): ürünlerin tam yerleşimi, renkler, kaplarda sunum
+- Sağ taraf (sağlıklı menü): ürünlerin tam yerleşimi, renkler, tabak/kase düzeni
+- Işıklama önerisi, arka plan tonu, odak noktası
+
+━━━ 2. INSTAGRAM CAROUSEL — 8 SLAYT ━━━
+Her slayt için şu formatı kullan:
+SLAYT [N] — [Emoji] [BAŞLIK]
+Metin: [2-3 cümle içerik]
+Tasarım Notu: [arka plan rengi, öne çıkan grafik/ikon önerisi]
+
+Slayt konuları sırasıyla:
+1. Kapak — "2 menü, 1 masa: hangisi ne anlatıyor?"
+2. Kalori karşılaştırması (2500 kcal vs ~600 kcal)
+3. Makro besinler (protein, karbonhidrat, yağ)
+4. Mikro besinler (vitamin, mineral, lif)
+5. Tokluk süresi ve kan şekeri etkisi
+6. Pratik bilgi — "Ne zaman hangisini tercih edersin?"
+7. Sürpriz gerçek (hamburger menünün de içerdiği bir faydalı besin)
+8. Harekete geçirici kapanış — CTA slaytı
+
+━━━ 3. LİNKEDİN POSTU ━━━
+Gıda profesyonellerine yönelik, bilimsel ton, karşılaştırmalı besin değerleri tablosu (metin formatında) dahil, 130-150 kelime.
+
+━━━ 4. HASHTAG (20 adet) ━━━
+Türkçe/İngilizce karma: gastronomi, beslenme, gıda mühendisliği, sağlık kategorileri.
+
+━━━ 5. İLK YORUM ÖNERİSİ ━━━
+Instagram'a ilk yorum olarak atılacak, takipçi etkileşimini artıracak kısa soru veya bilgi.`
   }
 };
 
